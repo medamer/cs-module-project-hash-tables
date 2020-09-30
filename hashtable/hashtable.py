@@ -120,7 +120,9 @@ class HashTable:
         else:
             self.my_tab[index] = new_node
             self.counter +=1
-
+        
+        # if self.get_load_factor() >= 0.7:
+        #     self.resize()
 
 
     def delete(self, key):
@@ -178,15 +180,16 @@ class HashTable:
         Implement this.
         """
         # Your code here:
-        load = 0.8 #self.get_load_factor
-        if load >= 0.7:
-            new_buckets = [None] * new_capacity
-
-            for bucket in self.my_tab:
-                for entry in bucket:
-                    new_bucket = self.djb2(entry.key) % new_capacity
-                    entry.next = new_buckets[new_bucket].next
-                    new_buckets[new_bucket].next = entry
+        old_tab = self.my_tab
+        self.capacity = new_capacity
+        self.my_tab = [None] * self.capacity
+        
+        for i in old_tab:
+            if i is not None:
+                cur = i
+                while cur is not None:
+                    self.put(cur.key, cur.value)
+                    cur = cur.next
 
 
 
