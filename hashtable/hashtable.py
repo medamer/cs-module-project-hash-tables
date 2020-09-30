@@ -23,8 +23,9 @@ class HashTable:
         # Your code here
         self.capacity = MIN_CAPACITY
         self.my_tab = [None] * self.capacity
-        # self.key = None
-        # self.value = None
+        self.head = None
+        self.counter = 0
+
 
     def get_num_slots(self):
         """
@@ -47,7 +48,8 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        load_factor = float(self.counter / len(self.my_tab))
+        return load_factor
 
     def fnv1(self, key):
         """
@@ -56,7 +58,14 @@ class HashTable:
         Implement this, and/or DJB2.
         """
         # Your code here
-        
+        hash = 0xcbf29ce484222325
+        byte_arr = key.encode('utf-8')
+        for byte in byte_arr:
+            hash = hash * 0x00000100000001B3
+            hash = hash ^ byte
+            hash = hash % 0x10000000000000000
+            
+        return hash
 
 
     def djb2(self, key):
@@ -66,7 +75,11 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
-
+        hash = 5381
+        byte_arr = key.encode('utf-8')
+        for byte in byte_arr:
+            hash = ((hash * 33) ^ byte) % 0x100000000
+        return hash
 
 
     def hash_index(self, key):
@@ -85,9 +98,29 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-        index = hash_index(self.key)
-        my_tab[index] = (self.key, self.value)
+        # Get the index:
+        index = self.hash_index(key)
+        # Create a new node:
+        new_node = HashTableEntry(key, value)
+        # Check the existing node:
+        cur = self.my_tab[index]
+
+        if cur:
+            prev = None
+            while cur:
+                # check if the same key:
+                if cur.key == key:
+                    # Update the value:
+                    cur.value = value
+                    return
+                prev = cur
+                cur = cur.next
+            
+            prev.next = new_node
+        else:
+            self.my_tab[index] = new_node
+            self.counter +=1
+
 
 
     def delete(self, key):
@@ -98,9 +131,22 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-        index = hash_index(self.key)
-        my_tab[index] = None
+        # If the hash table is empty:
+        index = self.hash_index(key)
+        cur = self.my_tab[index]
+        
+        if cur:
+            prev = None
+            while cur:
+                if cur.key == key:
+                    if prev:
+                        prev.next = cur.next
+                    else:
+                        self.my_tab[index] = cur.next
+                prev = cur
+                cur = cur.next
+                self.counter -= 1
+
 
     def get(self, key):
         """
@@ -111,9 +157,17 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        index = hash_index(self.key)
-        val = my_tab[index]
-        return val.value
+        index = self.hash_index(key)
+        cur = self.my_tab[index]
+
+
+        if cur:
+            while cur:
+                if cur.key == key:
+                    return cur.value
+                cur = cur.next
+
+        return None
 
 
     def resize(self, new_capacity):
@@ -123,7 +177,17 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # Your code here:
+        load = 0.8 #self.get_load_factor
+        if load >= 0.7:
+            new_buckets = [None] * new_capacity
+
+            for bucket in self.my_tab:
+                for entry in bucket:
+                    new_bucket = self.djb2(entry.key) % new_capacity
+                    entry.next = new_buckets[new_bucket].next
+                    new_buckets[new_bucket].next = entry
+
 
 
 
