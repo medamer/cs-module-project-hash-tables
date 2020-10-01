@@ -1,6 +1,21 @@
 def word_count(s):
     # Your code here
-
+    d = {}
+    sp_car = '":;,.-+=/\\|[]{}()*^&\`\"\t\r\n\f\b\a'
+    if s in sp_car:
+        return d
+    strings = s.replace(sp_car, "")
+    strings = strings.replace('.', '')
+    strings = strings.replace(',', '')
+    strings = strings.replace('"', '')
+    words = strings.lower().split()
+    
+    for word in words:
+        if word in d:
+            d[word] += 1
+        else:
+            d[word] = 1
+    return d
 
 
 if __name__ == "__main__":
