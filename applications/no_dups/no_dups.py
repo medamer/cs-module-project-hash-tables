@@ -1,16 +1,19 @@
 def no_dups(s):
     # Your code here
-    cache = {}
-    count = 0
+    cache = set()
+    words = []
 
-    string = set(s.split())
+
     if s == "":
-        return ""
-    for c in string:
-        if c not in cache:
-            cache[cache] = c
-            count +=1
-        return cache
+        return ''
+
+    for word in s.split():
+        if word not in cache:
+            words.append(word)
+            cache.add(word)
+            
+    cache = " ".join(words)
+    return cache
 
 
 
